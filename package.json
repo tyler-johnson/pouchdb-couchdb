@@ -1,0 +1,27 @@
+{
+	"name": "pouch-couch",
+	"version": "0.0.0",
+	"description": "Proper CouchDB support for PouchDB",
+	"author": "Tyler Johnson <tyler@vintyge.com>",
+	"main": "index.js",
+	"jsnext:main": "src/index.js",
+	"scripts": {
+		"lint": "jshint src/ test/",
+		"build": "make",
+		"prepublish": "npm run lint && npm run build"
+	},
+	"dependencies": {
+		"es6-promisify": "~3.0.0",
+		"lodash": "~4.0.0",
+		"pouchdb": "~5.2.0"
+	},
+	"keywords": [],
+	"license": "MIT",
+	"devDependencies": {
+		"babel-preset-es2015-rollup": "~1.1.1",
+		"jshint": "~2.9.1",
+		"rollup": "~0.25.1",
+		"rollup-plugin-babel": "~2.3.9",
+		"tape": "~4.4.0"
+	}
+}
