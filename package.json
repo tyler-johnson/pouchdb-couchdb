@@ -1,5 +1,5 @@
 {
-	"name": "pouch-couch",
+	"name": "pouchdb-couchdb",
 	"version": "0.0.0",
 	"description": "Proper CouchDB support for PouchDB",
 	"author": "Tyler Johnson <tyler@vintyge.com>",
