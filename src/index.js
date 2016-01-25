@@ -10,6 +10,8 @@ PouchDB.adapters.http.use_prefix = false;
 export default function(baseUrl, defaultOpts, callback) {
 	if (typeof baseUrl === "object") {
 		[callback,defaultOpts,baseUrl] = [defaultOpts,baseUrl,void 0];
+	} else if (typeof defaultOpts === "function") {
+		[callback,defaultOpts] = [defaultOpts,void 0];
 	}
 
 	defaultOpts = clone(defaultOpts || {});
@@ -40,7 +42,7 @@ export default function(baseUrl, defaultOpts, callback) {
 		opts.adapter = "http";
 		if (!opts.getHost) opts.getHost = utils.prefixHost(opts.baseUrl);
 
-		if (typeof callback !== "function") callback = (e)=>{ throw e; };
+		if (typeof callback !== "function") callback = (e)=>{ if (e) throw e; };
 		this._auth_mode = CouchDB._auth_mode;
 		let modeobj = CouchDB;
 
@@ -88,7 +90,7 @@ export default function(baseUrl, defaultOpts, callback) {
 			CouchDB.emit("error", e);
 			throw e;
 		}), done);
-	} else if (callback) {
+	} else {
 		process.nextTick(done);
 	}
 
