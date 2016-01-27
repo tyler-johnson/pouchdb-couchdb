@@ -3,6 +3,7 @@ import PouchDB from "pouchdb";
 import * as methods from "./methods";
 import {get as getMode} from "./modes/index.js";
 import * as utils from "./utils/index.js";
+import extend from "backbone-extend-standalone";
 
 // fixes http adapter's need to use the prefix value
 PouchDB.adapters.http.use_prefix = false;
@@ -81,6 +82,9 @@ export default function(baseUrl, defaultOpts, callback) {
 	CouchDB.request = utils.makeRequest(defaultOpts.ajax);
 	CouchDB.users = new CouchDB("_users");
 
+	CouchDB.extend = extend;
+	CouchDB.defaults = defaults;
+
 	let done = (err) => {
 		if (callback) callback(err, CouchDB);
 	};
@@ -95,4 +99,29 @@ export default function(baseUrl, defaultOpts, callback) {
 	}
 
 	return CouchDB;
+}
+
+function defaults(defaultOpts) {
+	let CouchDB = this;
+	let CouchAlt = this.extend({
+		constructor: function(name, opts, callback) {
+			if (!(this instanceof CouchAlt)) {
+				return new CouchAlt(name, opts, callback);
+			}
+
+			if (typeof opts === 'function' || typeof opts === 'undefined') {
+				callback = opts;
+				opts = {};
+			}
+			if (name && typeof name === 'object') {
+				opts = name;
+				name = undefined;
+			}
+
+			opts = assign({}, defaultOpts, opts);
+			CouchDB.call(this, name, opts, callback);
+		}
+	});
+
+	return CouchAlt;
 }

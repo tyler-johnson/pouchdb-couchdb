@@ -11,6 +11,7 @@
 		"prepublish": "npm run lint && npm run build"
 	},
 	"dependencies": {
+		"backbone-extend-standalone": "~0.1.2",
 		"es6-promisify": "~3.0.0",
 		"lodash": "~4.0.0",
 		"pouchdb": "~5.2.0"
