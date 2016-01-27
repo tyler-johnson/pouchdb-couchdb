@@ -1,6 +1,6 @@
 {
 	"name": "pouchdb-couchdb",
-	"version": "0.0.0",
+	"version": "0.1.0",
 	"description": "Proper CouchDB support for PouchDB",
 	"author": "Tyler Johnson <tyler@vintyge.com>",
 	"main": "index.js",
