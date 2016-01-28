@@ -1,7 +1,7 @@
 import {omit,clone,assign} from "lodash";
 import PouchDB from "pouchdb";
 import * as methods from "./methods";
-import {get as getMode} from "./modes/index.js";
+import {get as getMode,apply as applyMode} from "./modes/index.js";
 import * as utils from "./utils/index.js";
 import extend from "backbone-extend-standalone";
 
@@ -46,30 +46,24 @@ export default function(baseUrl, defaultOpts, callback) {
 		if (typeof callback !== "function") callback = (e)=>{ if (e) throw e; };
 		this._auth_mode = CouchDB._auth_mode;
 		let modeobj = CouchDB;
+		let p = [];
 
 		if (opts.authmode !== defaultOpts.authmode || opts.auth) {
 			if (!opts.auth) return callback(new Error("Missing auth with custom authmode."));
 			this._auth_mode = getMode(opts.authmode || defaultOpts.authmode);
 			modeobj = this;
-			let signinPromise;
-
-			PouchDB.call(this, name, opts, function(err, res) {
-				if (err) return callback(err);
-				utils.callbackify(signinPromise, (e) => callback(e, res));
-			});
-
-			signinPromise = Promise.resolve().then(() => {
-				return this._auth_mode.signIn.call(this, opts.auth);
-			});
-		} else {
-			// call Pouchdb constructor directly
-			PouchDB.call(this, name, opts, callback);
 		}
+
+		PouchDB.call(this, name, opts, function(err, res) {
+			if (err) return callback(err);
+			utils.callbackify(Promise.all(p), (e) => callback(e, res));
+		});
 
 		// PouchDB uses an excessive number of clones on the options value
 		// this makes it impossible to hack before we pass it the PouchDB constructor
-		// so instead we hack the headers value right after we set up
-		this._auth_mode.setup.call(modeobj, this.getHeaders());
+		// so instead we hack the headers value right after we set up, but
+		// still synchronously with the constructor
+		p.push(applyMode(this._auth_mode, "setup", CouchDB, [ this.getHeaders(), this ]));
 	}
 
 	CouchDB.prototype = Object.create(PouchAlt.prototype);
@@ -78,25 +72,24 @@ export default function(baseUrl, defaultOpts, callback) {
 
 	CouchDB.baseUrl = defaultOpts.baseUrl;
 	CouchDB._auth_mode = getMode(defaultOpts.authmode);
-	CouchDB._auth_mode.setup.call(CouchDB, defaultOpts.ajax.headers);
 	CouchDB.request = utils.makeRequest(defaultOpts.ajax);
 	CouchDB.users = new CouchDB("_users");
 
 	CouchDB.extend = extend;
 	CouchDB.defaults = defaults;
 
-	let done = (err) => {
-		if (callback) callback(err, CouchDB);
-	};
+	let p = [];
+	p.push(applyMode(CouchDB._auth_mode, "setup", CouchDB, [ defaultOpts.ajax.headers ]));
 
-	if (defaultOpts.auth) {
-		utils.callbackify(CouchDB.signIn(defaultOpts.auth).catch((e) => {
-			CouchDB.emit("error", e);
-			throw e;
-		}), done);
-	} else {
-		process.nextTick(done);
-	}
+	Promise.all(p).then(() => {
+		if (callback) callback(null, CouchDB);
+	}, (e) => process.nextTick(() => {
+		if (callback) callback(e);
+
+		// we don't want to auto-throw errors if something is going to catch it
+		// but we still definitely want the error event to run
+		if (!callback || this.listenerCount("error")) CouchDB.emit("error", e);
+	}));
 
 	return CouchDB;
 }

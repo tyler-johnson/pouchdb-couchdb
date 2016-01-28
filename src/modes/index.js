@@ -12,4 +12,9 @@ export function get(name) {
 	return mode;
 }
 
+export function apply(mode, name, ctx, args) {
+	if (typeof mode === "string") mode = get(mode);
+	return mode[name].apply(ctx, args);
+}
+
 register("basic", basic);
