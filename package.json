@@ -1,14 +1,18 @@
 {
 	"name": "pouchdb-couchdb",
-	"version": "0.1.0",
 	"description": "Proper CouchDB support for PouchDB",
 	"author": "Tyler Johnson <tyler@vintyge.com>",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/tyler-johnson/pouchdb-couchdb.git"
+	},
 	"main": "index.js",
 	"jsnext:main": "src/index.js",
 	"scripts": {
 		"lint": "jshint src/ test/",
+		"test": "tape test/index.js",
 		"build": "make",
-		"prepublish": "npm run lint && npm run build"
+		"semantic-release": "semantic-release pre && npm publish && semantic-release post"
 	},
 	"dependencies": {
 		"backbone-extend-standalone": "~0.1.2",
@@ -23,6 +27,7 @@
 		"jshint": "~2.9.1",
 		"rollup": "~0.25.1",
 		"rollup-plugin-babel": "~2.3.9",
+		"semantic-release": "^4.3.5",
 		"tape": "~4.4.0"
 	}
 }

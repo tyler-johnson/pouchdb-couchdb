@@ -1,32 +1,8 @@
-// require('request-debug')(require("request"));
+var test = require("tape");
+var makeCouchDB = require("../");
 
-function panic(e) {
-	console.error(e.stack || e);
-}
-
-var CouchDB = require("../")("http://localhost:5984");
-
-// console.log(CouchDB.baseUrl);
-// console.log(CouchDB.signedIn());
-//
-// CouchDB.on("error", panic);
-// CouchDB.on("signin", function(sess) {
-// 	console.log(CouchDB.signedIn());
-// 	console.log(sess);
-// });
-
-var db = new CouchDB("pagedip$directory");
-var superdb = new CouchDB("pagedip$directory", {
-	auth: { username: "admin", password: "12345" }
+test("generates PouchDB class", function(t) {
+	t.plan(1);
+	var CouchDB = makeCouchDB();
+	t.equals(typeof CouchDB, "function", "creates a function");
 });
-
-function ignore401(e) {
-	if (e.status !== 401) throw e;
-}
-
-Promise.all([
-	superdb.allDocs().catch(ignore401),
-	db.allDocs().catch(ignore401)
-]).then(function(res) {
-	console.log(res);
-}).catch(panic);
