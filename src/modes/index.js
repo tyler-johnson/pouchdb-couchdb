@@ -1,20 +1,15 @@
-import * as basic from "./basic";
+import {has} from "lodash";
+import basic from "./basic";
 
 const modes = {};
 
-export function register(name, methods) {
-	modes[name] = methods;
+export function register(name, fn) {
+	modes[name] = fn;
 }
 
-export function get(name) {
-	let mode = modes[name];
-	if (!mode) throw new Error(`Unknown auth mode '${name}'.`);
-	return mode;
-}
-
-export function apply(mode, name, ctx, args) {
-	if (typeof mode === "string") mode = get(mode);
-	return mode[name].apply(ctx, args);
+export function get(name, CouchDB) {
+	if (!has(modes, name)) throw new Error(`Unknown auth mode '${name}'.`);
+	return modes[name](CouchDB);
 }
 
 register("basic", basic);

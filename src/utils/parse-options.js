@@ -41,8 +41,9 @@ export default function(opts, defs) {
 	});
 
 	// parse authentication information
-	if (href.auth || typeof opts.auth === "string") {
-		var _auth = (href.auth || opts.auth).split(":");
+	if (href.auth) opts.auth = href.auth;
+	if (typeof opts.auth === "string") {
+		let _auth = opts.auth.split(":");
 		opts.auth = { username: _auth[0] || "", password: _auth[1] || "" };
 	}
 
