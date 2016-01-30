@@ -19,14 +19,14 @@ export default function (CouchDB) {
 			configurable: false
 		});
 
-		if (auth) return signIn.call(this, auth);
+		return signIn.call(this, auth);
 	}
 
 	function signIn(payload) {
-		this._authorization = {
+		this._authorization = payload ? {
 			name: stripUserIdPrefix(payload.username || payload.name),
 			pass: payload.password || payload.pass
-		};
+		} : null;
 
 		return CouchDB.request({
 			url: "/_session"
