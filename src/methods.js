@@ -1,38 +1,35 @@
-import {omit,clone} from "lodash";
+import {isEqual,omit,clone} from "lodash";
 import {add as addUserIdPrefix} from "./utils/userid-prefix.js";
-
-const emptySession = { name: null, roles: [] };
-
-function updateSession(Pouch, sess) {
-	let prev = Pouch._auth_session;
-	Pouch._auth_session = sess || clone(emptySession);
-	return prev;
-}
 
 export function allDbs(opts, cb) {
 	if (typeof opts === "function") [cb,opts] = [opts,null];
 	return this.request({ url: "/_all_dbs" }, cb);
 }
 
-export function signIn(payload) {
-	return Promise.resolve().then(() => {
-		return this._auth_mode.signIn.call(this, payload);
-	}).then((res) => {
-		updateSession(this, res);
-		let sess = this.session();
-		this.emit("signin", sess);
-		return sess;
-	});
+const emptySession = { name: null, roles: [] };
+
+function updateSession(Pouch, sess) {
+	let prev = Pouch._auth_session || emptySession;
+	sess = Pouch._auth_session = sess || clone(emptySession);
+	if (!isEqual(sess, prev)) {
+		if (sess) Pouch.emit("signin", sess);
+		else Pouch.emit("signout", prev);
+	}
+	return sess;
 }
 
-export function signOut(payload) {
+export function _applyModeMethod(name, args) {
 	return Promise.resolve().then(() => {
-		return this._auth_mode.signOut.call(this, payload);
-	}).then(() => {
-		let prev = updateSession(this, null);
-		this.emit("signout", prev);
-		return prev;
-	});
+		return this._auth_mode[name].apply(this, args);
+	}).then((res) => updateSession(this, res));
+}
+
+export function signIn() {
+	return this._applyModeMethod("signIn", arguments);
+}
+
+export function signOut() {
+	return this._applyModeMethod("signOut", arguments);
 }
 
 export function signUp(user) {

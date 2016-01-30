@@ -8,30 +8,36 @@ function authHeader(auth) {
 	if (auth) return "Basic " + toBase64((auth.name || "") + ":" + (auth.pass || ""));
 }
 
-export function setup(headers) {
-	let self = this;
-	Object.defineProperty(headers, "Authorization", {
-		get: function() {
-			return authHeader(self._authorization);
-		},
-		enumerable: true,
-		configurable: false
-	});
-}
+export default function (CouchDB) {
+	function setup(auth, headers) {
+		let self = this;
+		Object.defineProperty(headers, "Authorization", {
+			get: function() {
+				return authHeader(self._authorization);
+			},
+			enumerable: true,
+			configurable: false
+		});
 
-export function signIn(payload) {
-	this._authorization = {
-		name: stripUserIdPrefix(payload.username || payload.name),
-		pass: payload.password || payload.pass
-	};
+		return signIn.call(this, auth);
+	}
 
-	return this.request({
-		url: "/_session"
-	}).then((res) => {
-		return res.userCtx;
-	});
-}
+	function signIn(payload) {
+		this._authorization = payload ? {
+			name: stripUserIdPrefix(payload.username || payload.name),
+			pass: payload.password || payload.pass
+		} : null;
 
-export function signOut() {
-	delete this._authorization;
+		return CouchDB.request({
+			url: "/_session"
+		}).then((res) => {
+			return res.userCtx;
+		});
+	}
+
+	function signOut() {
+		delete this._authorization;
+	}
+
+	return { setup, signIn, signOut };
 }
