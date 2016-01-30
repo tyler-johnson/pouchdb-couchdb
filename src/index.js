@@ -84,8 +84,9 @@ export default function(baseUrl, defaultOpts, callback) {
 	let p = [];
 	p.push(CouchDB._applyModeMethod("setup", [ auth, defaultOpts.ajax.headers ]));
 
-	Promise.all(p).then(() => {
+	let setupPromise = Promise.all(p).then(() => {
 		if (callback) callback(null, CouchDB);
+		CouchDB.emit("ready");
 	}, (e) => {
 		if (callback) callback(e);
 		throw e;
@@ -95,6 +96,7 @@ export default function(baseUrl, defaultOpts, callback) {
 		if (!callback || CouchDB.listenerCount("error")) CouchDB.emit("error", e);
 	}));
 
+	CouchDB.setup = () => setupPromise;
 	return CouchDB;
 }
 

@@ -12,7 +12,7 @@ if (auth) {
 	};
 }
 
-exports.setup = function(opts, cb) {
+exports.create = function(opts, cb) {
 	if (typeof opts === "function") {
 		cb = opts;
 		opts = null;
