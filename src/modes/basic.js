@@ -28,11 +28,7 @@ export default function (CouchDB) {
 			pass: payload.password || payload.pass
 		} : null;
 
-		return CouchDB.request({
-			url: "/_session"
-		}).then((res) => {
-			return res.userCtx;
-		});
+		return CouchDB.getSession();
 	}
 
 	function signOut() {
