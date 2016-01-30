@@ -25,13 +25,15 @@ test("has admin credentials", function(t) {
 	}).catch(t.error.bind(t));
 });
 
-test("calls the signin event on initial setup", function(t) {
-	t.plan(2);
+test("calls the ready event after initial setup", function(t) {
+	t.plan(3);
 	var CouchDB = utils.create();
 
-	CouchDB.on("signin", function(sess) {
-		t.pass("called signin event");
-		t.ok(sess, "signin event includes admin session");
+	CouchDB.on("ready", function() {
+		t.pass("called ready event");
+		var sess = CouchDB.session();
+		t.ok(sess, "has a session");
+		t.ok(_.includes(sess.roles, "_admin"), "is a super admin");
 	});
 
 	CouchDB.setup().catch(t.error.bind(t));

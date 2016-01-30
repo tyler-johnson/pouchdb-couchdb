@@ -86,6 +86,7 @@ export default function(baseUrl, defaultOpts, callback) {
 
 	let setupPromise = Promise.all(p).then(() => {
 		if (callback) callback(null, CouchDB);
+		CouchDB.emit("ready");
 	}, (e) => {
 		if (callback) callback(e);
 		throw e;
