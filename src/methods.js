@@ -9,11 +9,11 @@ export function allDbs(opts, cb) {
 const emptySession = { name: null, roles: [] };
 
 function updateSession(Pouch, sess) {
-	let prev = Pouch._auth_session || emptySession;
+	let prev = Pouch._auth_session || clone(emptySession);
 	sess = Pouch._auth_session = sess || clone(emptySession);
 	if (!isEqual(sess, prev)) {
-		if (sess) Pouch.emit("signin", sess);
-		else Pouch.emit("signout", prev);
+		if (prev.name) Pouch.emit("signout", prev);
+		if (sess.name) Pouch.emit("signin", sess);
 	}
 	return sess;
 }
@@ -21,6 +21,8 @@ function updateSession(Pouch, sess) {
 export function _applyModeMethod(name, args) {
 	return Promise.resolve().then(() => {
 		return this._auth_mode[name].apply(this, args);
+	}).then(() => {
+		return new Promise((r) => process.nextTick(r));
 	}).then((res) => updateSession(this, res));
 }
 
