@@ -21,8 +21,8 @@ function updateSession(Pouch, sess) {
 export function _applyModeMethod(name, args) {
 	return Promise.resolve().then(() => {
 		return this._auth_mode[name].apply(this, args);
-	}).then(() => {
-		return new Promise((r) => process.nextTick(r));
+	}).then((p) => {
+		return new Promise((r) => process.nextTick(() => r(p)));
 	}).then((res) => updateSession(this, res));
 }
 
