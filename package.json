@@ -10,17 +10,27 @@
 	"jsnext:main": "src/index.js",
 	"scripts": {
 		"lint": "jshint src/ test/",
-		"test": "tape test/index.js",
+		"test": "make test",
 		"build": "make",
+		"prepublish": "npm run build",
 		"semantic-release": "semantic-release pre && npm publish && semantic-release post"
 	},
 	"dependencies": {
 		"backbone-extend-standalone": "~0.1.2",
-		"es6-promisify": "~3.0.0",
-		"lodash": "~4.0.0",
+		"es6-promisify": "^3.0.0",
+		"lodash": "4.x",
 		"pouchdb": "~5.2.0"
 	},
-	"keywords": [],
+	"keywords": [
+		"pouchdb",
+		"couchdb",
+		"couch",
+		"base",
+		"url",
+		"auth",
+		"db",
+		"database"
+	],
 	"license": "MIT",
 	"devDependencies": {
 		"babel-preset-es2015-rollup": "~1.1.1",

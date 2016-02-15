@@ -19,11 +19,9 @@ function updateSession(Pouch, sess) {
 }
 
 export function _applyModeMethod(name, args) {
-	return Promise.resolve().then(() => {
-		return this._auth_mode[name].apply(this, args);
-	}).then((p) => {
-		return new Promise((r) => process.nextTick(() => r(p)));
-	}).then((res) => updateSession(this, res));
+	return Promise.resolve(this._auth_mode[name].apply(this, args))
+	.then((res) => updateSession(this, res))
+	.then((p) => new Promise((r) => process.nextTick(() => r(p))));
 }
 
 export function signIn() {
@@ -67,8 +65,7 @@ export function getSession() {
 
 export function refreshSession() {
 	return this.getSession().then((sess) => {
-		updateSession(this, sess);
-		return this.session();
+		return updateSession(this, sess);
 	});
 }
 

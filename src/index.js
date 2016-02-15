@@ -1,14 +1,15 @@
 import {pick,omit,clone,assign} from "lodash";
 import PouchDB from "pouchdb";
 import * as methods from "./methods";
-import {get as getMode} from "./modes/index.js";
+import * as modes from "./modes/index.js";
 import * as utils from "./utils/index.js";
 import extend from "backbone-extend-standalone";
+import EventEmitter from "events";
 
 // fixes http adapter's need to use the prefix value
 PouchDB.adapters.http.use_prefix = false;
 
-export default function(baseUrl, defaultOpts, callback) {
+export default function PouchCouch(baseUrl, defaultOpts, callback) {
 	if (typeof baseUrl === "object") {
 		[callback,defaultOpts,baseUrl] = [defaultOpts,baseUrl,void 0];
 	} else if (typeof defaultOpts === "function") {
@@ -51,7 +52,7 @@ export default function(baseUrl, defaultOpts, callback) {
 		let p = [];
 
 		if (opts.authmode !== defaultOpts.authmode || opts.auth) {
-			this._auth_mode = getMode(opts.authmode || defaultOpts.authmode, CouchDB);
+			this._auth_mode = modes.get(opts.authmode || defaultOpts.authmode, CouchDB);
 		}
 
 		PouchDB.call(this, name, omit(opts, "authmode", "auth"), function(err, res) {
@@ -71,15 +72,16 @@ export default function(baseUrl, defaultOpts, callback) {
 
 	CouchDB.prototype = Object.create(PouchAlt.prototype);
 	CouchDB.prototype.constructor = CouchDB;
-	assign(CouchDB, PouchAlt, methods);
+	assign(CouchDB, PouchAlt, EventEmitter.prototype, methods);
+	EventEmitter.call(CouchDB);
 
 	CouchDB.baseUrl = defaultOpts.baseUrl;
-	CouchDB._auth_mode = getMode(defaultOpts.authmode, CouchDB);
+	CouchDB._auth_mode = modes.get(defaultOpts.authmode, CouchDB);
 	CouchDB.request = utils.makeRequest(defaultOpts.ajax);
 	CouchDB.users = new CouchDB("_users");
 
 	CouchDB.extend = extend;
-	CouchDB.defaults = defaults;
+	CouchDB.defaults = utils.defaults;
 
 	let p = [];
 	p.push(CouchDB._applyModeMethod("setup", [ auth, defaultOpts.ajax.headers ]));
@@ -100,27 +102,5 @@ export default function(baseUrl, defaultOpts, callback) {
 	return CouchDB;
 }
 
-function defaults(defaultOpts) {
-	let CouchDB = this;
-	let CouchAlt = this.extend({
-		constructor: function(name, opts, callback) {
-			if (!(this instanceof CouchAlt)) {
-				return new CouchAlt(name, opts, callback);
-			}
-
-			if (typeof opts === 'function' || typeof opts === 'undefined') {
-				callback = opts;
-				opts = {};
-			}
-			if (name && typeof name === 'object') {
-				opts = name;
-				name = undefined;
-			}
-
-			opts = assign({}, defaultOpts, opts);
-			CouchDB.call(this, name, opts, callback);
-		}
-	});
-
-	return CouchAlt;
-}
+PouchCouch.modes = modes;
+PouchCouch.utils = utils;

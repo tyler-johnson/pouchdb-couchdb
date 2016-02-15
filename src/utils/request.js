@@ -1,4 +1,4 @@
-import {assign} from "lodash";
+import {merge} from "lodash";
 import {parse} from "url";
 import {utils as PouchDBUtils} from "pouchdb";
 import promisify from "es6-promisify";
@@ -8,7 +8,7 @@ const ajax = promisify(PouchDBUtils.ajax);
 
 export default function(defaultOpts) {
 	return function(opts, cb) {
-		opts = assign({}, opts, defaultOpts);
+		opts = merge({}, defaultOpts, opts);
 		let uri = parse(opts.url, false, true);
 		if (!uri.host) {
 			let baseUrl = this.baseUrl;
