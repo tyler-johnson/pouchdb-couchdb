@@ -1,5 +1,7 @@
 # PouchDB CouchDB
 
+[![npm](https://img.shields.io/npm/v/pouchdb-couchdb.svg)](https://www.npmjs.com/package/pouchdb-couchdb) [![David](https://img.shields.io/david/tyler-johnson/pouchdb-couchdb.svg)](https://david-dm.org/tyler-johnson/pouchdb-couchdb) [![Build Status](https://travis-ci.org/tyler-johnson/pouchdb-couchdb.svg?branch=master)](https://travis-ci.org/tyler-johnson/pouchdb-couchdb)
+
 This is some sugar for PouchDB to make handling true CouchDB servers a little easier.
 
 - Set a base url for all databases.
@@ -36,7 +38,7 @@ You have your class sign in and out of the database with the `signIn()` and `sig
 ```js
 CouchDB.signIn("user","password").then(function() {
   console.log("signed in!");
-  
+
   return CouchDB.signOut();
 }).then(function() {
   console.log("signed out!");
