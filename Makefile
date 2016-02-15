@@ -23,7 +23,6 @@ require("rollup").rollup({
 	});
 });
 endef
-
 export ROLLUP
 
 $(OUT): src/index.js $(SRC)

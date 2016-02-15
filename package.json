@@ -10,8 +10,9 @@
 	"jsnext:main": "src/index.js",
 	"scripts": {
 		"lint": "jshint src/ test/",
-		"test": "tape test/index.js",
+		"test": "make && tape test/index.js",
 		"build": "make",
+		"prepublish": "npm run build",
 		"semantic-release": "semantic-release pre && npm publish && semantic-release post"
 	},
 	"dependencies": {

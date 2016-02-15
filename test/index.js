@@ -1,4 +1,4 @@
-var _ = require("lodash");
+// var _ = require("lodash");
 var test = require("tape");
 var makeCouchDB = require("../");
 var utils = require("./utils");
