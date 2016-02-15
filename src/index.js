@@ -3,14 +3,13 @@ import PouchDB from "pouchdb";
 import * as methods from "./methods";
 import * as modes from "./modes/index.js";
 import * as utils from "./utils/index.js";
-import defaults from "./utils/defaults";
 import extend from "backbone-extend-standalone";
 import EventEmitter from "events";
 
 // fixes http adapter's need to use the prefix value
 PouchDB.adapters.http.use_prefix = false;
 
-export default function createCouchDB(baseUrl, defaultOpts, callback) {
+export default function PouchCouch(baseUrl, defaultOpts, callback) {
 	if (typeof baseUrl === "object") {
 		[callback,defaultOpts,baseUrl] = [defaultOpts,baseUrl,void 0];
 	} else if (typeof defaultOpts === "function") {
@@ -82,7 +81,7 @@ export default function createCouchDB(baseUrl, defaultOpts, callback) {
 	CouchDB.users = new CouchDB("_users");
 
 	CouchDB.extend = extend;
-	CouchDB.defaults = defaults;
+	CouchDB.defaults = utils.defaults;
 
 	let p = [];
 	p.push(CouchDB._applyModeMethod("setup", [ auth, defaultOpts.ajax.headers ]));
@@ -103,4 +102,5 @@ export default function createCouchDB(baseUrl, defaultOpts, callback) {
 	return CouchDB;
 }
 
-createCouchDB.modes = modes;
+PouchCouch.modes = modes;
+PouchCouch.utils = utils;

@@ -1,14 +1,7 @@
 import {strip as stripUserIdPrefix} from "../utils/userid-prefix";
+import authHeader from "../utils/basic-auth-header";
 
-export var toBase64;
-if (typeof global.btoa === "function") toBase64 = global.btoa;
-else toBase64 = function(str) { return new Buffer(str, "utf-8").toString("base64"); };
-
-function authHeader(auth) {
-	if (auth) return "Basic " + toBase64((auth.name || "") + ":" + (auth.pass || ""));
-}
-
-export default function (CouchDB) {
+export default function basicAuth(CouchDB) {
 	function setup(auth, headers) {
 		let self = this;
 		Object.defineProperty(headers, "Authorization", {
@@ -37,3 +30,5 @@ export default function (CouchDB) {
 
 	return { setup, signIn, signOut };
 }
+
+basicAuth.authHeader = authHeader;

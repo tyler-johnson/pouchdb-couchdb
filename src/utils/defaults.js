@@ -1,4 +1,4 @@
-
+import {assign} from "lodash";
 
 export default function defaults(defaultOpts) {
 	let CouchDB = this;
